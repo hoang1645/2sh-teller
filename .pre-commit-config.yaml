@@ -35,15 +35,3 @@ repos:
       - id: black
         name: PEP8 formatting
         args: [ --skip-string-normalization, --line-length=100]
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        name: I-sort imports
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        name: PEP8 checker
