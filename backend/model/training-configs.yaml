@@ -1,0 +1,23 @@
+# model configuration
+model: 8B-Instruct
+load_in_nbits: 4
+custom_checkpoint_path: null
+# training configuration
+training:
+  efficient_finetuning_method: "lora" # set load_in_nbits=4 for qlora
+  lora_apply_layers:
+    - self_attn
+    - mlp
+    - embed_tokens
+  lora_dropout: 0.1
+  reft_component: null
+  reft_low_rank_dim: null
+# optimization config
+optimization:
+  lr: 0.0003
+  betas:
+    - 0.9
+    - 0.999
+  eps: 1.0E-06
+  weight_decay: 0.001
+# inference will be configured by frontend
