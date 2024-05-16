@@ -3,14 +3,7 @@ from typing import Callable, Literal, Tuple, List, Any
 import torch
 from torch.utils.data import Dataset
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
-from pyreft import (
-    get_reft_model,
-    ReftConfig,
-    LoreftIntervention,
-    ReftTrainerForCausalLM,
-    make_last_position_supervised_data_module,
-)
-from bitsandbytes.optim import PagedAdamW8bit
+from pyreft import get_reft_model, ReftConfig, LoreftIntervention, ReftTrainerForCausalLM
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -159,8 +152,8 @@ class Llama3Model:
             gradient_accumulation_steps=gradient_accumulation_steps,
         )
 
-        if data_collator is None:
-            data_collator = DataCollatorForLanguageModeling(self.tokenizer, mlm=False)
+        # if data_collator is None:
+        #     data_collator = DataCollatorForLanguageModeling(self.tokenizer, mlm=False)
         if self.efficient_finetuning_method != "reft":
             trainer = HFTrainer(
                 self.model,
@@ -170,12 +163,6 @@ class Llama3Model:
                 tokenizer=self.tokenizer,
             )
         else:
-            # """
-            # "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a pirate chatbot who always responds in pirate speak!<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nWho are you?<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nArrrr, me hearty! Me name be Captain Chat, the scurviest chatbot to ever sail the Seven Seas o' the Interwebs! Me be a swashbucklin' bot, ready to chat ye up about all things pirate-y, from the finest booty to the most treacherous sea battles. So hoist the colors, me hearty, and let's set sail fer a chat that'll make ye feel like ye've found yer treasure!<|eot_id|>""""
-            data_module = make_last_position_supervised_data_module(
-                self.tokenizer,
-                self.model,
-            )
             trainer = ReftTrainerForCausalLM(
                 self.model,
                 training_args,
