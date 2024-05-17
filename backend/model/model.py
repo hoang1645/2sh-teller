@@ -80,7 +80,7 @@ class Llama3Model:
         # model initialization
         self.model_id = f"meta-llama/Meta-Llama-3-{model}"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
-        self.model = AutoModelForCausalLM(
+        self.model = AutoModelForCausalLM.from_pretrained(
             custom_checkpoint_path
             or self.model_id,  # load checkpoint if exists, if not load the baseline
             **quantization_config,
