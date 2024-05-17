@@ -75,7 +75,13 @@ class Llama3Model:
             quantization_config['torch_dtype'] = torch.float32
         # model initialization
         self.model_id = f"meta-llama/Meta-Llama-3-{model}"
+
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
+
+        # set the tokenizer end-of-sentence token
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+
         self.model = AutoModelForCausalLM.from_pretrained(
             custom_checkpoint_path
             or self.model_id,  # load checkpoint if exists, if not load the baseline
