@@ -148,8 +148,8 @@ class Llama3Model:
             gradient_accumulation_steps=gradient_accumulation_steps,
         )
 
-        # if data_collator is None:
-        #     data_collator = DataCollatorForLanguageModeling(self.tokenizer, mlm=False)
+        if data_collator is None:
+            data_collator = DataCollatorForLanguageModeling(self.tokenizer, mlm=False)
         if self.efficient_finetuning_method != "reft":
             trainer = HFTrainer(
                 self.model,

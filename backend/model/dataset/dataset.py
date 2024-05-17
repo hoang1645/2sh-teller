@@ -1,5 +1,6 @@
 import json
 from torch.utils.data import Dataset
+from transformers import AutoTokenizer
 
 
 class CustomDataset(Dataset):
@@ -7,6 +8,8 @@ class CustomDataset(Dataset):
         super().__init__()
         with open(data_file, encoding="utf8") as file:
             self.data = json.load(file)
+
+        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
 
         self.sys_prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a two-sentence horror storyteller.
         Given the user's one sentence, continue with exactly one sentence to make a two-sentence horror story.
@@ -18,7 +21,14 @@ class CustomDataset(Dataset):
     def __getitem__(self, index) -> tuple:
         inp = f"{self.sys_prompt}{self.user_prompt_format.format(self.data[index][0])}"
         out = inp + self.assistant_format.format(self.data[index][1])
-        return inp, out
+
+        out = self.tokenizer(out, return_tensors='pt')
+
+        return {
+            'input_ids': out['input_ids'].squeeze(),  # Convert to 1D tensor
+            'attention_mask': out['attention_mask'].squeeze(),  # Convert to 1D tensor
+            'labels': out['input_ids'].squeeze(),
+        }
 
     def __len__(self):
         return len(self.data)
