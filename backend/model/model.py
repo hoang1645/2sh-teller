@@ -51,24 +51,20 @@ class Llama3Model:
             )
 
         # quantization configurations
-        quantization_config = {"load_in_4bit": False, "load_in_8bit": False}
+        quantization_config = {}
         # 4bit (for qlora)
         if load_in_n_bits == 4:
-            quantization_config["load_in_4bit"] = True
             quantization_config["quantization_config"] = BitsAndBytesConfig(
                 bnb_4bit_compute_dtype=torch.bfloat16,
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_use_double_quant=True,
-                **quantization_config,
+                load_in_4bit=True,
             )
             quantization_config["torch_dtype"] = torch.bfloat16
         # 8bit (llm-int8)
         if load_in_n_bits == 8:
-            quantization_config["load_in_8bit"] = True
             quantization_config["quantization_config"] = BitsAndBytesConfig(
-                llm_int8_skip_modules="lm_head",
-                llm_int8_has_fp16_weight=True,
-                **quantization_config,
+                llm_int8_skip_modules="lm_head", llm_int8_has_fp16_weight=True, load_in_8bit=True
             )
             quantization_config["torch_dtype"] = torch.bfloat16
         # 16bit (bf16)
@@ -86,7 +82,7 @@ class Llama3Model:
             **quantization_config,
         )
         # optimizer
-        self.optimizer = self.__optimizer(**quantization_config)
+        self.optimizer = self.__optimizer(**dict(quantization_config['quantization_config']))
         # prepare model for quantization training
         if load_in_n_bits <= 8:
             self.model = prepare_model_for_kbit_training(self.model)
@@ -115,9 +111,9 @@ class Llama3Model:
             self.model = get_reft_model(self.model, config)
 
     def __optimizer(
-        self, load_in_4bit: bool, load_in_8bit: bool
+        self, _load_in_4bit: bool, _load_in_8bit: bool, **unused_kwargs
     ) -> Callable[..., torch.optim.Optimizer]:
-        if load_in_4bit or load_in_8bit:
+        if _load_in_4bit or _load_in_8bit:
             return "paged_adamw_8bit"
         return "adamw"
 
