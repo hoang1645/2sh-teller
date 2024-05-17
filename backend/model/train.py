@@ -1,6 +1,6 @@
 import yaml
 from model import Llama3Model
-from model.dataset.dataset import CustomDataset
+from dataset.dataset import CustomDataset
 
 # def parse_args():
 # parser = argparse.ArgumentParser()
@@ -21,6 +21,6 @@ if __name__ == "__main__":
         args = yaml.load(conf)
 
     model = Llama3Model(args.model_size, args.from_ckpt, **args['training'])
-    dataset = CustomDataset("model/dataset/dset.json")
+    dataset = CustomDataset("dataset/dset.json")
     model.finetune(dataset, epochs=args['epochs'], **args['optimization'])
     model.save_checkpoint("./checkpoints")
