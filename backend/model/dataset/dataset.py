@@ -22,7 +22,7 @@ class CustomDataset(Dataset):
         inp = f"{self.sys_prompt}{self.user_prompt_format.format(self.data[index][0])}"
         out = inp + self.assistant_format.format(self.data[index][1])
 
-        out = self.tokenizer(out, return_tensors='pt')
+        out = self.tokenizer(out, return_tensors='pt', padding="max_length", max_length=512)
 
         return {
             'input_ids': out['input_ids'].squeeze(),  # Convert to 1D tensor
