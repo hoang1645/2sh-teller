@@ -18,7 +18,8 @@ from dataset.dataset import CustomDataset
 
 if __name__ == "__main__":
     with open("training-configs.yaml", encoding="utf8") as conf:
-        args = yaml.load(conf)
+        loader = yaml.SafeLoader(conf)
+        args = yaml.load(conf, loader)
 
     model = Llama3Model(args.model_size, args.from_ckpt, **args['training'])
     dataset = CustomDataset("dataset/dset.json")
