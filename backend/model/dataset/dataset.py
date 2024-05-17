@@ -10,6 +10,9 @@ class CustomDataset(Dataset):
             self.data = json.load(file)
 
         self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
+        # set the tokenizer pad token
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
 
         self.sys_prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a two-sentence horror storyteller.
         Given the user's one sentence, continue with exactly one sentence to make a two-sentence horror story.
