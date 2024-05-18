@@ -4,7 +4,7 @@ import yaml
 from fastapi import FastAPI
 from pydantic_models import *
 
-# from model.model import Llama3Model
+from model.model import Llama3Model
 
 # TODO: docstrings
 
@@ -12,7 +12,7 @@ from pydantic_models import *
 with open("../infer-configs.yaml", encoding="utf8") as conf:
     args = yaml.load(conf, yaml.SafeLoader)
 
-# model = Llama3Model(args["model"], args["custom_checkpoint_path"], **args['training'])
+model = Llama3Model(args["model"], args["custom_checkpoint_path"], **args['training'])
 app = FastAPI()
 
 
@@ -32,7 +32,7 @@ async def chat(payload: QueryPayload):
     if "sentences" not in data.keys():
         return json.dumps({"error": "missing the conversation"})
 
-    # out_sentences = model.generate(**data)
-    # return {"status": "OK", "reply": out_sentences[0]}
+    out_sentences = model.generate(**data)
+    return {"status": "OK", "reply": out_sentences[0]}
     # debug
-    return {'status': "OK", **data}
+    # return {'status': "OK", **data}
