@@ -1,7 +1,7 @@
 # model configuration
 model: 8B-Instruct
 load_in_nbits: 8
-custom_checkpoint_path: null    # this will be set later
+custom_checkpoint_path: ../qlora-3e
 # training configuration
 training:
   efficient_finetuning_method: null

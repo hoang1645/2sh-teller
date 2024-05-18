@@ -7,7 +7,7 @@ from model.model import Llama3Model
 # TODO: docstrings
 
 
-with open("training-configs.yaml", encoding="utf8") as conf:
+with open("../infer-configs.yaml", encoding="utf8") as conf:
     args = yaml.load(conf, yaml.SafeLoader)
 
 model = Llama3Model(args["model"], args["custom_checkpoint_path"], **args['training'])
