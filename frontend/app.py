@@ -53,4 +53,4 @@ if prompt := st.chat_input("Your prompt here..."):
     )
     response = json.loads(rq.text)
     print(response)
-    st.chat_message("assistant").write("got")
+    st.chat_message("assistant").write(response['reply'])
