@@ -230,7 +230,9 @@ class Llama3Model:
         """
         if isinstance(sentences[0], dict):
             sentences = [sentences]
-        input_ids = self.tokenizer.apply_chat_template(sentences, padding=True, return_tensors='pt')
+        input_ids = self.tokenizer.apply_chat_template(
+            sentences, add_generation_prompt=True, padding=True, return_tensors='pt'
+        )
         lengths = input_ids.shape[-1]
         gen_config = GenerationConfig(
             beam_size=beam_size,
