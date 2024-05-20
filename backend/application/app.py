@@ -33,7 +33,6 @@ async def chat(payload: QueryPayload):
         return json.dumps({"error": "missing the conversation"})
 
     out_sentences = model.generate(**data)
-    return_payload = json.dumps(out_sentences[0])
-    return {"status": "OK", "reply": return_payload}
+    return {"status": "OK", "reply": out_sentences[0]}
     # debug
     return {'status': "OK", **data}
