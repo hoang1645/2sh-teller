@@ -116,7 +116,7 @@ class Llama3Model:
                 task_type="CAUSAL_LM",
                 lora_dropout=lora_dropout,
                 r=lora_r,
-                alpha=lora_alpha,
+                lora_alpha=lora_alpha,
             )
 
             self.model = get_peft_model(self.model, config)
