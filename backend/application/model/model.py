@@ -230,9 +230,7 @@ class Llama3Model:
         """
         if isinstance(sentences[0], dict):
             sentences = [sentences]
-        input_ids = self.tokenizer.apply_chat_template(
-            sentences, padding=True, return_tensors='pt'
-        ).input_ids
+        input_ids = self.tokenizer.apply_chat_template(sentences, padding=True, return_tensors='pt')
         lengths = input_ids.shape[-1]
         gen_config = GenerationConfig(
             beam_size=beam_size,
@@ -240,8 +238,15 @@ class Llama3Model:
             top_k=top_k,
             top_p=top_p,
             temperature=temperature,
+            max_length=1024,
         )
-        out_tokens = self.model.generate(input_ids, gen_config)
+        terminators = [
+            self.tokenizer.eos_token_id,
+            self.tokenizer.convert_tokens_to_ids("<|eot_id|>"),
+        ]
+        out_tokens = self.model.generate(
+            input_ids, gen_config, eos_token_id=terminators, do_sample=True
+        )
         out_sentences = self.tokenizer.batch_decode(
             out_tokens[:, lengths:], skip_special_tokens=True
         )
