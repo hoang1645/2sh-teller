@@ -24,12 +24,28 @@ class Llama3Model:
         load_in_n_bits: Literal[4, 8, 16, 32] = 4,
         efficient_finetuning_method: Literal["lora", "reft", None] = None,
         lora_apply_layers: List[str] = ["self_attn", "mlp", "embed_tokens"],
+        lora_r: int = 8,
+        lora_alpha: int = 8,
         lora_dropout: float = 0.1,
         reft_component: int | str = None,
         reft_low_rank_dim: int = None,
     ):
         """
         Wrapper for Llama 3 model, including training and inference.
+
+        Params:
+        - `model`: the Llama 3 model size. Defaults to the `8B-Instruct` version.
+        - `custom_checkpoint_path`: the model (or adapter if the model was finetuned with LoRa) checkpoint saved with `Llama3Model.save_checkpoint`.
+        - `load_in_n_bits`: Specifies the fp/quantization type. `32` uses fp32, `16` uses bf16, `8` uses llm.int8 quantization, `4` uses nf4 quantization from QLoRa.
+        - `efficient_finetuning_method`: The efficient finetuning method for the model. Currently only supports LoRa (QLoRa if `load_in_n_bits=4`).
+            `reft` (Representation Fine-tuning) is there to show that I can do it if allowed to, however `pyreft` does not have support for Llama 3 tokenizer yet,
+            so it is a work in progress.
+        - `lora_apply_layers`: Layers to be applied with LoRa, if specified.
+        - `lora_dropout`: The dropout rate used with LoRa if specified.
+        - `lora_r`: The rank used for LoRa if specified.
+        - `lora_alpha`: LoRa α, used if LoRa training is specified.
+        - `reft_component`: The layer and layer component to use ReFT.
+        - `reft_low_rank_dim`: The rank used for ReFT.
         """
 
         # save important args to use in other methods
@@ -96,7 +112,11 @@ class Llama3Model:
         # lora setup
         if efficient_finetuning_method == 'lora':
             config = LoraConfig(
-                target_modules=lora_apply_layers, task_type="CAUSAL_LM", lora_dropout=lora_dropout
+                target_modules=lora_apply_layers,
+                task_type="CAUSAL_LM",
+                lora_dropout=lora_dropout,
+                r=lora_r,
+                alpha=lora_alpha,
             )
 
             self.model = get_peft_model(self.model, config)
@@ -138,6 +158,19 @@ class Llama3Model:
         eps: float = 1e-8,
         epochs: int = 3,
     ):
+        """
+        Finetune the model with configurations specified.
+
+        Params:
+        - `dataset`: a `torch.utils.data.Dataset` where indexing it returns an element as a dict with the keys:
+            - `input_ids` and `labels`: the tokens extracted from the Llama 3 tokenizer, padded and truncated to a fixed length
+            - `attention_mask`: the attention mask generated with the Llama 3 tokenizer.
+        - `batch_size`: the training batch size.
+        - `gradient_accumulation_steps`: how many steps to accumulate gradients before performing a backward pass
+        - `data_collator`: preferably of type `transformers.DataCollator`, the data collator used for the Hugging Face trainer.
+        - `lr`, `betas`, `weight_decay`, `eps`: The usual parameters for the AdamW optimizer.
+        - `epochs`: number of training epochs.
+        """
         if not self.trainable:
             ValueError("currently not supporting finetuning with this model's configurations")
         training_args = TrainingArguments(
@@ -184,6 +217,17 @@ class Llama3Model:
         top_p: float = 1,
         temperature: float = 1,
     ):
+        """
+        Generate the next line of the conversation.
+
+        Params:
+        - `sentences`: List (or list of lists) of dicts specifying roles and messages of the conversation.
+        - `beam_size`: Beam size for beam search
+        - `n_return_sequences`: How many versions of the next line should be generated
+        - `top_k`: specifies how many tokens with highest softmax probabilities to be sampled (Top-k sampling)
+        - `top_p`: specifies the cummulative probability limit to choose tokens with highest softmax probabilities (Top-p/Nucleus sampling)
+        - `temperature`: the temperature of the generation: lower = less creative, follows more to the training data; higher = more creative, but also higher rate of hallucination.
+        """
         if isinstance(sentences[0], dict):
             sentences = [sentences]
         input_ids = self.tokenizer.apply_chat_template(
