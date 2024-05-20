@@ -53,6 +53,5 @@ if prompt := st.chat_input("Your prompt here..."):
     )
     response = json.loads(rq.text)
     print(response)
-    reply = json.loads(response['reply'])  # remove the "assistant" part before the json
     # reply = json.loads(reply)
-    st.chat_message("assistant").write(reply)
+    st.chat_message("assistant").write(response['reply'])
