@@ -31,7 +31,7 @@ huggingface-cli login
 ```
 - Download the model adapter (if you want to use my finetuned version)
 ```bash
-gdown [fill in the blank] -O backend/qlora-3e.zip
+gdown 1zeN4nY3Q7O16mRdiL6vTOT-me6TTBX3a -O backend/qlora-3e.zip
 cd backend
 unzip qlora-3e.zip
 ```
