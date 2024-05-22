@@ -46,12 +46,19 @@ if prompt := st.chat_input("Your prompt here..."):
     }
 
     payload_b64 = base64.b64encode(json.dumps(payload, ensure_ascii=False).encode()).decode()
-    rq = requests.post(
-        "http://localhost:8000/query",
-        json={"base64_converted_chat_history_json_and_settings": payload_b64},
-        headers={"Content-Type": "application/json"},
-    )
+    try:
+        rq = requests.post(
+            "http://localhost:8000/query",
+            json={"base64_converted_chat_history_json_and_settings": payload_b64},
+            headers={"Content-Type": "application/json"},
+        )
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
+        print("Something is wrong with the backend")
+        st.error("Something has gone wrong")
     response = json.loads(rq.text)
     print(response)
     # reply = json.loads(reply)
-    st.chat_message("assistant").write(response['reply'])
+    if "error" in response:
+        st.error("An error has occured: ", response['error'])
+    else:
+        st.chat_message("assistant").write(response['reply'])
