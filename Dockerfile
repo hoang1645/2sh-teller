@@ -10,7 +10,9 @@ RUN git clone https://github.com/hoang1645/cinnamon-ai-pre-entrance-test-submiss
 
 RUN cd cinnamon-ai-pre-entrance-test-submission; pip install -r requirements.txt
 
-RUN gdown 1zeN4nY3Q7O16mRdiL6vTOT-me6TTBX3a -O backend/qlora-3e.zip
-RUN cd backend/; unzip qlora-3e.zip; cd ..
+RUN gdown 1zeN4nY3Q7O16mRdiL6vTOT-me6TTBX3a -O cinnamon-ai-pre-entrance-test-submission/backend/qlora-3e.zip
+RUN cd cinnamon-ai-pre-entrance-test-submission/backend/; unzip qlora-3e.zip; cd ..
 
-RUN cd backend/application; fastapi run app.py & cd ../../frontend; streamlit run app.py&
+
+# don't run this yet since you're not logged in to huggingface cli
+# RUN cd backend/application; fastapi run app.py & cd ../../frontend; streamlit run app.py&
