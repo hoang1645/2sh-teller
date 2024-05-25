@@ -15,7 +15,6 @@ from transformers import (
 )
 
 
-# TODO: add comprehensive docstrings for important methods
 class Llama3Model:
     def __init__(
         self,

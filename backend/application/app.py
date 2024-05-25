@@ -11,8 +11,6 @@ from pydantic_models import *
 
 from model.model import Llama3Model
 
-# TODO: docstrings
-
 
 # log
 def configure_logging():
