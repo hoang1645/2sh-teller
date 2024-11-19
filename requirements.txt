@@ -3,7 +3,7 @@ rich==13.7.1
 transformers==4.40.2
 peft==0.10.0
 bitsandbytes==0.43.1
-streamlit==1.34.0
+streamlit==1.40.1
 fastapi
 pyreft
 gdown
